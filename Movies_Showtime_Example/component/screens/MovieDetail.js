@@ -12,7 +12,6 @@ export default function MovieDetail({ route, navigation }) {
         const itemId = route.params.id;
         axios.get(`https://movie-api.igeargeek.com/movies/${itemId}`)
             .then(res => {
-            console.log("res", res.data)
             const movieData = res.data;
             setMovieData(movieData)
             setLoading(false)
@@ -30,31 +29,23 @@ export default function MovieDetail({ route, navigation }) {
     return (
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
             <WebView
+                allowsFullscreenVideo
+                allowsInlineMediaPlayback
+                mediaPlaybackRequiresUserAction
                 style={styles.videoLayout}
                 source={{uri: movieData.youtubeUrl}}
             />
             <View style={styles.movieInfoToplayout}>
                 <View style={styles.movieInfoView}>
                     <Image source={{uri: movieData.posterUrl}} 
-                        style={{ flex: 1, height: 190 }} resizeMethod="scale" resizeMode='stretch' />
-                    <View style={{flex: 2, marginLeft: 15}}>
+                        style={styles.moviePosterImage} resizeMode='stretch' />
+                    <View style={styles.movieInformationLayout}>
                         <Text style={styles.textMovieTitle}>{movieData.name}</Text>
-                        <View style={styles.textMovieLayout}>
-                            <Text style={styles.textMovieDetail}>ประเภท: </Text>
-                            {movieData.genre.map((item, index) => {
-                                return(
-                                    <Text key={index} style={styles.textMovieDetail}>{item} </Text>
-                                )
-                            })}
+                        <View>
+                            <Text style={styles.textMovieGenre}>ประเภท: {movieData.genre.join(', ')}</Text>
                         </View>
-                        <View style={styles.textMovieLayout}>
-                            <Text style={styles.textMovieDetail}>วันที่เข้าฉาย: </Text>
-                            <Text style={styles.textMovieDetail}>{moment(movieData.show_date).format('DD MMM YYYY')}</Text>
-                        </View>
-                        <View style={styles.textMovieLayout}>
-                            <Text style={styles.textMovieDetail}>ระยะเวลา: </Text>
-                            <Text style={styles.textMovieDetail}>{movieData.duration}นาที</Text>
-                        </View>
+                        <Text style={styles.textMovieDetail}>วันที่เข้าฉาย: {moment(movieData.showingAt).format('DD MMM YYYY')}</Text>
+                        <Text style={styles.textMovieDetail}>ระยะเวลา: {movieData.duration} นาที</Text>
                     </View>
                 </View>
                 <View
@@ -88,16 +79,12 @@ const styles = StyleSheet.create({
     },
     underLine: {
         borderBottomColor: '#fff',
-        borderBottomWidth: 0.3,
+        borderBottomWidth: 1,
         marginVertical: 15
     },
     movieBottomLayout: {
         flexDirection: 'row', 
         paddingBottom: 20
-    },
-    textMovieLayout: {
-        flexDirection: 'row', 
-        alignItems: 'baseline'
     },
     textMovieInfo: {
         color: '#fff',
@@ -122,7 +109,22 @@ const styles = StyleSheet.create({
     textMovieDetail: {
         color: '#fff',
         fontSize: 13,
-        marginBottom: 10
+        marginBottom: 10,
+    },
+    textMovieGenre: {
+        flex: 1, 
+        flexWrap: 'wrap',
+        color: '#fff',
+        fontSize: 13,
+        marginBottom: 10,
+    },
+    moviePosterImage: {
+        flex: 1, 
+        height: 190 
+    },
+    movieInformationLayout: {
+        flex: 2, 
+        marginLeft: 15
     }
 })
 

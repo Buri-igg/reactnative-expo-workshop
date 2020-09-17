@@ -28,8 +28,9 @@ const Navigation = () => (
 					name="MovieDetail" 
 					component={MovieDetail}
 					options={{
-						title: '',
-						headerBackTitle: "ย้อนกลับ"
+						title: null,
+						headerBackTitle: null,
+						headerTruncatedBackTitle: null
 					}}
 				/>
       </Stack.Navigator>
