@@ -1,13 +1,12 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import MovieNavigation from './component/navigations/MovieNavigation';
+import { StyleSheet, View } from 'react-native';
+import MovieNavigation from './component/navigation/MovieNavigation';
 
 export default function App() {
 
   return (
     <View style={styles.container}>
-      {/* <MovieNavigation /> */}
-      <Text style={{marginTop: 50, alignSelf: 'center'}}>Example Movies Showtime</Text>
+      <MovieNavigation />
     </View>
   );
 }

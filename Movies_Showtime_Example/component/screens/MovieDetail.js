@@ -1,96 +1,72 @@
-import React, { Component } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, StyleSheet, View, Image, ActivityIndicator, ScrollView } from 'react-native'
 import { WebView } from 'react-native-webview';
 import axios from 'axios';
+import moment from 'moment'
 
-export default class MovieDetail extends Component {
-    static navigationOptions = {
-        headerStyle: {
-            backgroundColor: '#000',
-            borderBottomWidth: 0
-        },
-        headerTintColor: '#fff'
-    };
+export default function MovieDetail({ route, navigation }) {
+    const [movieData, setMovieData] = useState({});
+    const [isLoading, setLoading] = useState(true);
 
-    state = {
-        movieData: [],
-        loading: true
-    }
-
-    componentDidMount() {
-        const itemId = this.props.navigation.getParam('id');
-        axios.get(`https://react-native-workshop-api.igeargeek.com/movie/${itemId}`)
+    useEffect(() => {
+        const itemId = route.params.id;
+        axios.get(`https://movie-api.igeargeek.com/movies/${itemId}`)
             .then(res => {
+            console.log("res", res.data)
             const movieData = res.data;
-            this.setState({ 
-                movieData,
-                loading: false
-             });
+            setMovieData(movieData)
+            setLoading(false)
+            navigation.setOptions({ title: movieData.name })
         })
-    }
-    
-    render() {
-        const { movieData } = this.state
-        if (this.state.loading) {
-            return(
-                <View style={styles.loading}>
-                    <ActivityIndicator size="large" color="#000" />
-                </View>
-            )
-        }
-        return (
-            <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+      }, [])
 
-                <WebView
-                    style={styles.videoLayout}
-                    source={{uri: movieData.video}}
-                />
-                <View style={styles.movieInfoToplayout}>
-                    <View style={styles.movieInfoView}>
-                        <Image source={{uri: movieData.image}} 
-                            style={{ flex: 1, height: 190 }} resizeMethod="scale" resizeMode='stretch' />
-                        <View style={{flex: 2, marginLeft: 15}}>
-                            <Text style={styles.textMovieTitle}>{movieData.title.th}</Text>
-                            <View style={{flexDirection: 'row'}}>
-                                <Text style={styles.textMovieDetail}>ประเภท: </Text>
-                                {movieData.categories.map((item, index) => {
-                                    return(
-                                        <Text key={index} style={styles.textMovieDetail}>{item} </Text>
-                                    )
-                                })}
-                            </View>
-                            <View style={{flexDirection: 'row'}}>
-                                <Text style={styles.textMovieDetail}>วันที่เข้าฉาย: </Text>
-                                <Text style={styles.textMovieDetail}>{movieData.show_date}</Text>
-                            </View>
-                            <View style={{flexDirection: 'row'}}>
-                                <Text style={styles.textMovieDetail}>ระยะเวลา: </Text>
-                                <Text style={styles.textMovieDetail}>{movieData.running_time}นาที</Text>
-                            </View>
-                        </View>
-                    </View>
-                    <View
-                    style={styles.underLine}
-                    />
-                    <View style={{flex: 3}}>
-                        <View style={styles.movieBottomLayout}>
-                            <View style={{flex: 1}}>
-                                <Text style={styles.textMovieInfo}>ผู้กำกับ</Text>
-                                <Text style={styles.textMovieInfo}>{movieData.director}</Text>
-                            </View>
-                            <View style={{flex: 1}}>
-                                <Text style={styles.textMovieInfo}>นักแสดง</Text>
-                                <Text style={styles.textMovieInfo}>{movieData.actor}</Text>
-                            </View>
-                        </View>
-                        <Text style={styles.textMovieInfo}>เรื่องย่อ</Text>
-                        <Text style={styles.descriptionMovie}>{movieData.description}</Text>
-                    </View>
-                </View>
-            </ScrollView>
-
+    if (isLoading) {
+        return(
+            <View style={styles.loading}>
+                <ActivityIndicator size="large" color="#000" />
+            </View>
         )
     }
+    return (
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+            <WebView
+                style={styles.videoLayout}
+                source={{uri: movieData.youtubeUrl}}
+            />
+            <View style={styles.movieInfoToplayout}>
+                <View style={styles.movieInfoView}>
+                    <Image source={{uri: movieData.posterUrl}} 
+                        style={{ flex: 1, height: 190 }} resizeMethod="scale" resizeMode='stretch' />
+                    <View style={{flex: 2, marginLeft: 15}}>
+                        <Text style={styles.textMovieTitle}>{movieData.name}</Text>
+                        <View style={styles.textMovieLayout}>
+                            <Text style={styles.textMovieDetail}>ประเภท: </Text>
+                            {movieData.genre.map((item, index) => {
+                                return(
+                                    <Text key={index} style={styles.textMovieDetail}>{item} </Text>
+                                )
+                            })}
+                        </View>
+                        <View style={styles.textMovieLayout}>
+                            <Text style={styles.textMovieDetail}>วันที่เข้าฉาย: </Text>
+                            <Text style={styles.textMovieDetail}>{moment(movieData.show_date).format('DD MMM YYYY')}</Text>
+                        </View>
+                        <View style={styles.textMovieLayout}>
+                            <Text style={styles.textMovieDetail}>ระยะเวลา: </Text>
+                            <Text style={styles.textMovieDetail}>{movieData.duration}นาที</Text>
+                        </View>
+                    </View>
+                </View>
+                <View
+                style={styles.underLine}
+                />
+                <View style={{flex: 3}}>
+                    <Text style={styles.textMovieInfo}>เรื่องย่อ</Text>
+                    <Text style={styles.descriptionMovie}>{movieData.description}</Text>
+                </View>
+            </View>
+        </ScrollView>
+    )
 }
 
 const styles = StyleSheet.create({
@@ -119,6 +95,10 @@ const styles = StyleSheet.create({
         flexDirection: 'row', 
         paddingBottom: 20
     },
+    textMovieLayout: {
+        flexDirection: 'row', 
+        alignItems: 'baseline'
+    },
     textMovieInfo: {
         color: '#fff',
         fontSize: 15
@@ -145,3 +125,4 @@ const styles = StyleSheet.create({
         marginBottom: 10
     }
 })
+
