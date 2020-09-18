@@ -27,11 +27,13 @@ export default function MovieDetail({ route, navigation }) {
         )
     }
     return (
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1 }} 
+            contentContainerStyle={{ flexGrow: 1 }}
+        >
             <WebView
                 allowsFullscreenVideo
-                allowsInlineMediaPlayback
-                mediaPlaybackRequiresUserAction
                 style={styles.videoLayout}
                 source={{uri: movieData.youtubeUrl}}
             />
